@@ -117,11 +117,11 @@ def solve_system(f, mu_0, dt, T):
     return u, mu
 
 def f(x, y):
-    mask1 = np.bitwise_and(abs(x-0.3) < 0.1, abs(y-0.5) < 0.2)
-    mask2 = np.bitwise_and(abs(x-0.7) < 0.1, abs(y-0.5) < 0.2)
+    mask1 = np.bitwise_and(abs(x-1/4) < 1/8, abs(y-0.5) < 1/4)
+    mask2 = np.bitwise_and(abs(x-3/4) < 1/8, abs(y-0.5) < 1/4)
     res = np.zeros_like(x)
-    res[mask1] = 1.0
-    res[mask2] = -1.0
+    res[mask1] = 2.0
+    res[mask2] = -2.0
     return res
 
 def mu_0():
@@ -203,7 +203,7 @@ def compute_mu_grad_u(u, mu, x, y, triangles):
     return cx, cy, vx, vy
 
 
-def plot_solution(u, mu):
+def plot_solution(u, mu, title=""):
     """
     Create 3 plots:
     1. mu (piecewise constant on triangles)
@@ -238,15 +238,21 @@ def plot_solution(u, mu):
     ax.set_title(r'$\mu \nabla u$')
     ax.set_aspect('equal')
 
+    if title:
+        fig.suptitle(title)
+
     plt.tight_layout()
     plt.show()
 
 if __name__=='__main__':
     n = 20
     dx = 1.0 / n
-    dt = 0.01
-    T = 10
+    dt = 1
+    T = 100
     sigma = 1e-10
     mu_initial = mu_0()
-    u, mu = solve_system(f, mu_initial, dt, T)
-    plot_solution(u, mu)
+    mu = mu_initial
+    for i in range(20):
+        T = 100
+        u, mu = solve_system(f, mu, dt, T)
+        plot_solution(u, mu, f"T={T*(i+1)}")
